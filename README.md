@@ -8,12 +8,17 @@ Below is the Terraform visualization of the infrastructure that's created:
 **Table of Contents**
 
 <!-- toc -->
-+ [**1.0 Resources**](#10-resources)
++ [**1.0 `deploy.sh` script arguments**](#10-deploysh-script-arguments)
+    - [**1.1 `subnet_prefix` argument:**](#11-subnet_prefix-argument)
++ [**2.0 Resources**](#20-resources)
 <!-- tocstop -->
 
 ---
 
-| VPC Prefix | Desired Subnet | newbits | Resulting Subnets | IPs per Subnet |
+## **1.0 `deploy.sh` script arguments**
+
+### **1.1 `subnet_prefix` argument:**
+| VPC Prefix | Subnet Prefix | newbits | Resulting Subnets | IPs per Subnet |
 |------------|----------------|---------|-------------------|----------------|
 | `/16` | `/20` | `4` | 16 subnets | 4,096 |
 | `/16` | `/24` | `8` | 256 subnets | 256 |
@@ -22,5 +27,5 @@ Below is the Terraform visualization of the infrastructure that's created:
 | `/20` | `/28` | `8` | 256 subnets | 16 |
 | `/24` | `/28` | `4` | 16 subnets | 16 |
 
-## **1.0 Resources**
+## **2.0 Resources**
 - [CIDR to IPv4 Conversion](https://www.ipaddressguide.com/cidr)

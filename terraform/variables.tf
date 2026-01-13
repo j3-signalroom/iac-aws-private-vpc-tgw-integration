@@ -37,8 +37,8 @@ variable "tfe_token" {
 # ===================================================
 # VPC CONFIGURATION
 # ===================================================
-variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
+variable "vpc_cidrs" {
+  description = "CIDR block for the VPCs (comma-separated)"
   type        = string
   default     = "10.0.0.0/16"
 }
@@ -52,20 +52,23 @@ variable "subnet_prefix" {
 variable "subnet_count" {
   description = "Number of subnets to create"
   type        = number
+  default     = 3
 }
 
 variable "environment_name" {
   description = "Environment name"
   type        = string
+  default     = ""
 }
 
-variable "vpc_name" {
-  description = "Repositpory name"
+variable "vpc_prefix_name" {
+  description = "Repositpory prefix name"
   type        = string
   default     = "signalroom"
 }
 
 locals {
-  vpc_prefix = tonumber(split("/", var.vpc_cidr)[1])
+  vpc_list   = tolist(toset(split(",", var.vpc_cidrs)))
+  vpc_prefix = tonumber(split("/", local.vpc_list[0])[1])
   newbits    = var.subnet_prefix - local.vpc_prefix
 }

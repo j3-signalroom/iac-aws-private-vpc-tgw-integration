@@ -18,7 +18,7 @@ Below is the Terraform visualization of the infrastructure that's created:
 ## **1.0 `deploy.sh` script arguments**
 
 ### **1.1 `subnet_prefix` argument:**
-| VPC Prefix | Subnet Prefix | newbits | Resulting Subnets | IPs per Subnet |
+| **VPC Prefix** | `subnet_prefix` | **newbits** | Resulting Subnets | IPs per Subnet |
 |------------|----------------|---------|-------------------|----------------|
 | `/16` | `/20` | `4` | 16 subnets | 4,096 |
 | `/16` | `/24` | `8` | 256 subnets | 256 |
@@ -26,6 +26,11 @@ Below is the Terraform visualization of the infrastructure that's created:
 | `/20` | `/24` | `4` | 16 subnets | 256 |
 | `/20` | `/28` | `8` | 256 subnets | 16 |
 | `/24` | `/28` | `4` | 16 subnets | 16 |
+
+**What you need to know:**
+- The **newbits** determines how many additional bits to add to the network prefix for subnettings.
+- The **VPC Prefix** is the number after the slash in your VPC's CIDR block.  It indicates **how many bits define the network portion** of the IP address range.
+- The `subnet_prefix` is the target prefix length you want for your subnetsafter subdividing your VPC CIDR block.
 
 ## **2.0 Resources**
 - [CIDR to IPv4 Conversion](https://www.ipaddressguide.com/cidr)

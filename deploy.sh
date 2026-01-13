@@ -9,8 +9,8 @@
 #   To create infrastructure:
 #     ./deploy.sh=create --profile=<SSO_PROFILE_NAME> \
 #                        --tfe-token=<TFE_TOKEN> \
-#                        --vpc-name=<VPC_NAME> \
-#                        --vpc-cidr=<VPC_CIDR> \
+#                        --vpc-prefix-name=<VPC_PREFIX_NAME> \
+#                        --vpc-cidrs=<VPC_CIDRS> \
 #                        [--subnet-prefix=<SUBNET_PREFIX>] \
 #                        [--subnet-count=<SUBNET_COUNT>] \
 #                        [--environment-name=<ENVIRONMENT_NAME>]
@@ -63,17 +63,17 @@ case $1 in
     echo
     echo "(Error Message 001)  You did not specify one of the commands: create | destroy."
     echo
-    echo "Usage:  Require all four arguments ---> `basename $0`=<create | destroy> --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-name=<VPC_NAME> --vpc-cidr=<VPC_CIDR>"
+    echo "Usage:  Require all four arguments ---> `basename $0`=<create | destroy> --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
     ;;
 esac
 
 # Default required variables
-AWS_PROFILE=""          # AWS SSO Profile Name
-tfe_token=""            # Terraform Token
-vpc_name=""             # VPC Name
-vpc_cidr="10.0.0.0/16"  # VPC CIDR Block
+AWS_PROFILE=""           # AWS SSO Profile Name
+tfe_token=""             # Terraform Token
+vpc_prefix_name=""       # VPC Prefix Names
+vpc_cidrs="10.0.0.0/16"  # VPC CIDR Blocks
 
 
 # Default optional variables
@@ -92,12 +92,12 @@ do
         *"--tfe-token="*)
             arg_length=12
             tfe_token=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
-        *"--vpc-name="*)
-            arg_length=11
-            vpc_name=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
-        *"--vpc-cidr="*)
-            arg_length=11
-            vpc_cidr=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--vpc-prefix-name="*)
+            arg_length=18
+            vpc_prefix_name=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--vpc-cidrs="*)
+            arg_length=12
+            vpc_cidrs=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--subnet-prefix="*)
             arg_length=16
             subnet_prefix=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
@@ -116,7 +116,7 @@ then
     echo
     echo "(Error Message 002)  You did not include the proper use of the --profile=<SSO_PROFILE_NAME> argument in the call."
     echo
-    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-name=<VPC_NAME> --vpc-cidr=<VPC_CIDR>"
+    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -127,29 +127,29 @@ then
     echo
     echo "(Error Message 003)  You did not include the proper use of the --tfe-token=<TFE_TOKEN> argument in the call."
     echo
-    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-name=<VPC_NAME> --vpc-cidr=<VPC_CIDR>"
+    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
 
-# Check required --vpc-name argument for the create action was supplied
-if [ -z "$vpc_name" ] && [ "$create_action" = "true" ]
+# Check required --vpc-prefix-name argument for the create action was supplied
+if [ -z "$vpc_prefix_name" ] && [ "$create_action" = "true" ]
 then
     echo
-    echo "(Error Message 004)  You did not include the proper use of the --vpc-name=<VPC_NAME> argument in the call."
+    echo "(Error Message 004)  You did not include the proper use of the --vpc-prefix-name=<VPC_PREFIX_NAME> argument in the call."
     echo
-    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-name=<VPC_NAME> --vpc-cidr=<VPC_CIDR>"
+    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
 
-# Check required --vpc-cidr argument for the create action was supplied
-if [ -z "$vpc_cidr" ] && [ "$create_action" = "true" ]
+# Check required --vpc-cidrs argument for the create action was supplied
+if [ -z "$vpc_cidrs" ] && [ "$create_action" = "true" ]
 then
     echo
-    echo "(Error Message 005)  You did not include the proper use of the --vpc-cidr=<VPC_CIDR> argument in the call."
+    echo "(Error Message 005)  You did not include the proper use of the --vpc-cidrs=<VPC_CIDRS> argument in the call."
     echo
-    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-name=<VPC_NAME> --vpc-cidr=<VPC_CIDR>"
+    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -172,8 +172,8 @@ deploy_infrastructure() {
     export TF_VAR_aws_secret_access_key="${AWS_SECRET_ACCESS_KEY}"
     export TF_VAR_aws_session_token="${AWS_SESSION_TOKEN}"
     export TF_VAR_tfe_token="${tfe_token}"
-    export TF_VAR_vpc_name="${vpc_name}"
-    export TF_VAR_vpc_cidr="${vpc_cidr}"
+    export TF_VAR_vpc_prefix_name="${vpc_prefix_name}"
+    export TF_VAR_vpc_cidrs=${vpc_cidrs}
     export TF_VAR_subnet_prefix="${subnet_prefix}"
     export TF_VAR_subnet_count="${subnet_count}"
     export TF_VAR_environment_name="${environment_name}"

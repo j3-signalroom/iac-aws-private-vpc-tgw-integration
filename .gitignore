@@ -41,6 +41,8 @@ crash.*.log
 *.tfvars
 *.tfvars.json
 
+generated-outputs.json
+
 # IMPORTANT: Secrets files (NEVER COMMIT)
 **/secrets.tfvars
 **/secrets.auto.tfvars

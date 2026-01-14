@@ -7,7 +7,7 @@
 #
 # Usage Examples:
 #   To create infrastructure:
-#     ./deploy.sh=create --profile=<SSO_PROFILE_NAME> \
+#     ./deploy.sh create --profile=<SSO_PROFILE_NAME> \
 #                        --tfe-token=<TFE_TOKEN> \
 #                        --vpc-prefix-name=<VPC_PREFIX_NAME> \
 #                        --vpc-cidrs=<VPC_CIDRS> \
@@ -16,7 +16,7 @@
 #                        [--environment-name=<ENVIRONMENT_NAME>]
 #
 #   To destroy infrastructure:
-#     ./deploy.sh=destroy --profile=<SSO_PROFILE_NAME> \
+#     ./deploy.sh destroy --profile=<SSO_PROFILE_NAME> \
 #                         --tfe-token=<TFE_TOKEN>
 #
 #

@@ -38,3 +38,30 @@ resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private.id
 }
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "main" {
+  subnet_ids         = aws_subnet.private[*].id
+  transit_gateway_id = var.transit_gateway_id
+  vpc_id             = aws_vpc.vpc.id
+
+  tags = {
+    Name = "app-vpc-attachment"
+  }
+}
+
+# Associate with route table
+resource "aws_ec2_transit_gateway_route_table_association" "main" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.main.id
+  transit_gateway_route_table_id = var.transit_gateway_route_table_id
+}
+
+# Allow VPN clients in security group
+resource "aws_security_group_rule" "allow_vpn" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = [var.vpc_cidr]
+  security_group_id = aws_vpc.vpc.default_security_group_id
+}
+

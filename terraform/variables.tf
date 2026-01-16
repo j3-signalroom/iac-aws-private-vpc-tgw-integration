@@ -67,8 +67,17 @@ variable "vpc_prefix_name" {
   default     = "signalroom"
 }
 
-locals {
-  vpc_list   = tolist(toset(split(",", var.vpc_cidrs)))
-  vpc_prefix = tonumber(split("/", local.vpc_list[0])[1])
-  newbits    = var.subnet_prefix - local.vpc_prefix
+# ===================================================
+# TRANSIT GATEWAY CONFIGURATION
+# ===================================================
+variable "transit_gateway_id" {
+  description = "Identifier of EC2 Transit Gateway."
+  type        = string
+  default     = ""
+}
+
+variable "transit_gateway_route_table_id" {
+  description = "Identifier of EC2 Transit Gateway Route Table."
+  type        = string
+  default     = ""
 }

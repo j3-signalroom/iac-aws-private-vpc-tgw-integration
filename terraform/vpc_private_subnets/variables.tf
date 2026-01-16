@@ -22,3 +22,18 @@ variable "new_bits" {
     description = "New bit"
     type = number
 }
+
+# ===================================================
+# TRANSIT GATEWAY CONFIGURATION
+# ===================================================
+variable "transit_gateway_id" {
+  description = "Identifier of EC2 Transit Gateway."
+  type        = string
+  default     = ""
+}
+
+variable "transit_gateway_route_table_id" {
+  description = "Identifier of EC2 Transit Gateway Route Table."
+  type        = string
+  default     = ""
+}

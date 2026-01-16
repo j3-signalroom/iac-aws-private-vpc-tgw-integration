@@ -1,5 +1,5 @@
 module "vpc_private_subnets" {
-  for_each          = { for index, cidr in tolist(toset(split(",", var.vpc_cidrs))) : index => cidr }
+  for_each          = { for index, cidr in local.vpc_list : index => cidr }
 
   source            = "./vpc_private_subnets"
 
@@ -7,5 +7,8 @@ module "vpc_private_subnets" {
   subnet_count      = var.subnet_count
   vpc_name          = "${var.vpc_prefix_name}-${var.environment_name}-${each.key}"
   environment_name  = var.environment_name
-  new_bits           = local.newbits
+  new_bits          = local.newbits
+
+  transit_gateway_id             = var.transit_gateway_id
+  transit_gateway_route_table_id = var.transit_gateway_route_table_id
 }

@@ -11,6 +11,8 @@
 #                        --tfe-token=<TFE_TOKEN> \
 #                        --vpc-prefix-name=<VPC_PREFIX_NAME> \
 #                        --vpc-cidrs=<VPC_CIDRS> \
+#                        --transit-gateway-id=<TRANSIT_GATEWAY_ID> \
+#                        --transit-gateway-route-table-id=<TRANSIT_GATEWAY_ROUTE_TABLE_ID> \
 #                        [--subnet-prefix=<SUBNET_PREFIX>] \
 #                        [--subnet-count=<SUBNET_COUNT>] \
 #                        [--environment-name=<ENVIRONMENT_NAME>]
@@ -70,11 +72,12 @@ case $1 in
 esac
 
 # Default required variables
-AWS_PROFILE=""           # AWS SSO Profile Name
-tfe_token=""             # Terraform Token
-vpc_prefix_name=""       # VPC Prefix Names
-vpc_cidrs="10.0.0.0/16"  # VPC CIDR Blocks
-
+AWS_PROFILE=""                                      # AWS SSO Profile Name
+tfe_token=""                                        # Terraform Token
+vpc_prefix_name=""                                  # VPC Prefix Names
+vpc_cidrs="10.0.0.0/20,10.1.0.0/20"                 # VPC CIDR Blocks
+transit_gateway_id="tgw-12345678"                   # VPN EC2 Transit Gateway identifier
+transit_gateway_route_table_id="tgw-rtb-12345678"   # VPN EC2 Transit Gateway Route Table identifier
 
 # Default optional variables
 environment_name="dev"  # Environment Name
@@ -98,6 +101,12 @@ do
         *"--vpc-cidrs="*)
             arg_length=12
             vpc_cidrs=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--transit-gateway-id="*)
+            arg_length=21
+            transit_gateway_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--transit-gateway-route-table-id="*)
+            arg_length=33
+            transit_gateway_route_table_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--subnet-prefix="*)
             arg_length=16
             subnet_prefix=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
@@ -116,7 +125,7 @@ then
     echo
     echo "(Error Message 002)  You did not include the proper use of the --profile=<SSO_PROFILE_NAME> argument in the call."
     echo
-    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS>"
+    echo "Usage:  Require all six arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS> --transit-gateway-id=<TRANSIT_GATEWAY_ID> --transit-gateway-route-table-id=<TRANSIT_GATEWAY_ROUTE_TABLE_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -127,7 +136,7 @@ then
     echo
     echo "(Error Message 003)  You did not include the proper use of the --tfe-token=<TFE_TOKEN> argument in the call."
     echo
-    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS>"
+    echo "Usage:  Require all six arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS> --transit-gateway-id=<TRANSIT_GATEWAY_ID> --transit-gateway-route-table-id=<TRANSIT_GATEWAY_ROUTE_TABLE_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -138,7 +147,7 @@ then
     echo
     echo "(Error Message 004)  You did not include the proper use of the --vpc-prefix-name=<VPC_PREFIX_NAME> argument in the call."
     echo
-    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS>"
+    echo "Usage:  Require all six arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS> --transit-gateway-id=<TRANSIT_GATEWAY_ID> --transit-gateway-route-table-id=<TRANSIT_GATEWAY_ROUTE_TABLE_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -149,10 +158,33 @@ then
     echo
     echo "(Error Message 005)  You did not include the proper use of the --vpc-cidrs=<VPC_CIDRS> argument in the call."
     echo
-    echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS>"
+    echo "Usage:  Require all six arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS> --transit-gateway-id=<TRANSIT_GATEWAY_ID> --transit-gateway-route-table-id=<TRANSIT_GATEWAY_ROUTE_TABLE_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
+
+# Check required --transit-gateway-id argument for the create action was supplied
+if [ -z "$transit_gateway_id" ] && [ "$create_action" = "true" ]
+then
+    echo
+    echo "(Error Message 006)  You did not include the proper use of the --transit-gateway-id=<TRANSIT_GATEWAY_ID> argument in the call."
+    echo
+    echo "Usage:  Require all six arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS> --transit-gateway-id=<TRANSIT_GATEWAY_ID> --transit-gateway-route-table-id=<TRANSIT_GATEWAY_ROUTE_TABLE_ID>"
+    echo
+    exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
+fi
+
+# Check required --transit-gateway-route-table-id argument for the create action was supplied
+if [ -z "$transit_gateway_route_table_id" ] && [ "$create_action" = "true" ]
+then
+    echo
+    echo "(Error Message 007)  You did not include the proper use of the --transit-gateway-route-table-id=<TRANSIT_GATEWAY_ROUTE_TABLE_ID> argument in the call."
+    echo
+    echo "Usage:  Require all six arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --tfe-token=<TFE_TOKEN> --vpc-prefix-name=<VPC_PREFIX_NAME> --vpc-cidrs=<VPC_CIDRS> --transit-gateway-id=<TRANSIT_GATEWAY_ID> --transit-gateway-route-table-id=<TRANSIT_GATEWAY_ROUTE_TABLE_ID>"
+    echo
+    exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
+fi
+
 
 # Get the AWS SSO credential variables that are used by the AWS CLI commands to authenicate
 print_step "Authenticating with AWS SSO using profile: $AWS_PROFILE"
@@ -174,6 +206,8 @@ deploy_infrastructure() {
     export TF_VAR_tfe_token="${tfe_token}"
     export TF_VAR_vpc_prefix_name="${vpc_prefix_name}"
     export TF_VAR_vpc_cidrs=${vpc_cidrs}
+    export TF_VAR_transit_gateway_id=${transit_gateway_id}
+    export TF_VAR_transit_gateway_route_table_id=${transit_gateway_route_table_id}
     export TF_VAR_subnet_prefix="${subnet_prefix}"
     export TF_VAR_subnet_count="${subnet_count}"
     export TF_VAR_environment_name="${environment_name}"

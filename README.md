@@ -1,4 +1,4 @@
-# Infrastructure as Code (IaC) AWS Private VPC Setup
+# Infrastructure as Code (IaC) AWS Private VPC with integration to a Transit Gateway Setup
 This repository contains Terraform code to create a private Virtual Private Clouds (VPC) in AWS. The setup includes subnets, route tables, security groups, and other necessary components to establish a secure and isolated network environment.
 
 Below is the Terraform visualization of the infrastructure that's created:

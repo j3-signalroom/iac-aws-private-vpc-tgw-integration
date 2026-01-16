@@ -3,6 +3,10 @@ output "vpc_id" {
   value       = aws_vpc.vpc.id
 }
 
+output "default_security_group_id" {
+  description = "The ID of the security group created by default on VPC creation"
+  value       = aws_vpc.vpc.default_security_group_id
+}
 output "private_subnet_ids" {
   description = "List of all private subnet IDs"
   value       = aws_subnet.private[*].id

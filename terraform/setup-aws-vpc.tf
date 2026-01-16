@@ -11,4 +11,5 @@ module "vpc_private_subnets" {
 
   transit_gateway_id             = var.transit_gateway_id
   transit_gateway_route_table_id = var.transit_gateway_route_table_id
+  vpn_client_cidr                = var.vpn_client_cidr
 }

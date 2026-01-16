@@ -37,3 +37,9 @@ variable "transit_gateway_route_table_id" {
   type        = string
   default     = ""
 }
+
+variable "vpn_client_cidr" {
+  description = "VPN Client CIDR is the return path route so resources in a VPC can send traffic back to VPN clients."
+  type        = string
+  default     = "10.200.0.0/22"
+}

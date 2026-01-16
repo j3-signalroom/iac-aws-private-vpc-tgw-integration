@@ -55,6 +55,12 @@ resource "aws_ec2_transit_gateway_route_table_association" "main" {
   transit_gateway_route_table_id = var.transit_gateway_route_table_id
 }
 
+resource "aws_route" "to_vpn_clients" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = var.vpn_client_cidr
+  transit_gateway_id     = var.transit_gateway_id
+}
+
 # Allow VPN clients in security group
 resource "aws_security_group_rule" "allow_vpn" {
   type              = "ingress"
